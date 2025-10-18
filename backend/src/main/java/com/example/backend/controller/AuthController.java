@@ -31,7 +31,7 @@ public class AuthController {
         User u = new User();
         u.setName(body.get("name"));
         u.setEmail(email);
-        u.setPassword(passwordEncoder.encode(body.get("password")));
+        u.setPassword(body.get("password"));
         u.setPhone(body.get("phone"));
         u.setAddress(body.get("address"));
         u.setRoles(Set.of(Role.ROLE_USER));
