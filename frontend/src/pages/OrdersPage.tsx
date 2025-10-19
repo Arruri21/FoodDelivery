@@ -16,7 +16,7 @@ export default function OrdersPage() {
         <div className="menu-summary-head">
           <div>
             <h2 className="section-title">Order status</h2>
-            <p className="muted">Track every order you have placed and monitor its latest status in real time.</p>
+            <p className="muted">Track every order, cancel pending ones, and monitor each status update in real time.</p>
           </div>
           <div className="menu-summary-actions">
             <button className="btn btn-ghost" onClick={() => navigate('/restaurants')}>

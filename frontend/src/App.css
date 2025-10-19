@@ -210,6 +210,7 @@ body,html,#root{font-family:Inter,Segoe UI,Roboto,Arial,sans-serif;color:#e6eef8
 .status-pill{padding:4px 10px;border-radius:999px;background:rgba(122,92,255,0.2);color:#d5c8ff;font-size:12px;font-weight:600}
 .history-body ul{list-style:none;margin:8px 0 0 0;padding:0;display:flex;flex-direction:column;gap:4px;font-size:13px}
 .history-card footer{display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(255,255,255,0.05);padding-top:8px;font-size:14px}
+.history-card footer .btn{margin-left:auto}
 
 .menu-item .btn{align-self:center}
 
@@ -233,4 +234,6 @@ body,html,#root{font-family:Inter,Segoe UI,Roboto,Arial,sans-serif;color:#e6eef8
   .driver-order-actions{width:100%;flex-direction:column;align-items:stretch}
   .driver-status-select{width:100%}
   .driver-order-actions .btn{width:100%}
+  .history-card footer{flex-direction:column;align-items:flex-start;gap:12px}
+  .history-card footer .btn{margin-left:0;width:100%}
 }
