@@ -1,12 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { ChangeEvent } from 'react'
-
-interface CartItem {
-  id: number
-  name: string
-  price?: number | null
-  quantity: number
-}
+import type { CartItem } from '../types'
 
 interface OrderSummaryProps {
   cart: CartItem[]

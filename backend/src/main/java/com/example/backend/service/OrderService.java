@@ -18,4 +18,6 @@ public class OrderService {
     public Order save(Order order) { return orderRepository.save(order); }
     public List<Order> findByUserId(Long userId) { return orderRepository.findByUserId(userId); }
     public Optional<Order> findById(Long id) { return orderRepository.findById(id); }
+    public List<Order> findAll() { return orderRepository.findAll(); }
+    public List<Order> findByDriverId(Long driverId) { return orderRepository.findByDriverId(driverId); }
 }

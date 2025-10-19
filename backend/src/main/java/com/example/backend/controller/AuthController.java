@@ -2,6 +2,7 @@ package com.example.backend.controller;
 
 import com.example.backend.model.Role;
 import com.example.backend.model.User;
+import com.example.backend.service.DeliveryDriverService;
 import com.example.backend.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -15,11 +16,13 @@ import java.util.Set;
 public class AuthController {
 
     private final UserService userService;
+    private final DeliveryDriverService deliveryDriverService;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-    
 
-    public AuthController(UserService userService) {
+
+    public AuthController(UserService userService, DeliveryDriverService deliveryDriverService) {
         this.userService = userService;
+        this.deliveryDriverService = deliveryDriverService;
     }
 
     @PostMapping("/signup")
@@ -28,15 +31,28 @@ public class AuthController {
         if (userService.findByEmail(email).isPresent()) {
             return ResponseEntity.badRequest().body(Map.of("error", "Email already in use"));
         }
-        User u = new User();
-        u.setName(body.get("name"));
-        u.setEmail(email);
-        u.setPassword(body.get("password"));
-        u.setPhone(body.get("phone"));
-        u.setAddress(body.get("address"));
-        u.setRoles(Set.of(Role.ROLE_USER));
-        userService.createUser(u);
-        return ResponseEntity.ok(Map.of("message", "user created"));
+    String requestedRole = body.getOrDefault("role", "CUSTOMER");
+    Role role = "AGENT".equalsIgnoreCase(requestedRole) || "DRIVER".equalsIgnoreCase(requestedRole)
+        ? Role.ROLE_DRIVER
+        : Role.ROLE_USER;
+
+    User u = new User();
+    u.setName(body.get("name"));
+    u.setEmail(email);
+    u.setPassword(body.get("password"));
+    u.setPhone(body.get("phone"));
+    u.setAddress(body.get("address"));
+    u.setRoles(Set.of(role));
+    User saved = userService.createUser(u);
+
+    if (role == Role.ROLE_DRIVER) {
+        deliveryDriverService.upsertForUser(saved, saved.getPhone());
+    }
+
+    return ResponseEntity.ok(Map.of(
+        "message", "user created",
+        "roles", saved.getRoles()
+    ));
     }
 
     @PostMapping("/login")

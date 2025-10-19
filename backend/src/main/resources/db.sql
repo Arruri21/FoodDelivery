@@ -55,9 +55,11 @@ CREATE TABLE menu_items (
 
 CREATE TABLE delivery_drivers (
   id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  user_id BIGINT UNIQUE,
   name VARCHAR(255) NOT NULL,
   contact VARCHAR(100),
-  available BOOLEAN DEFAULT TRUE
+  available BOOLEAN DEFAULT TRUE,
+  CONSTRAINT fk_driver_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE orders (
@@ -103,10 +105,12 @@ INSERT INTO roles (name) VALUES ('ROLE_USER'), ('ROLE_RESTAURANT'), ('ROLE_DRIVE
 
 -- Insert a test user (password currently placeholder; see options below to set real hash)
 INSERT INTO users (id, name, email, password, phone, address)
-VALUES (1, 'Test User', 'user@example.com', '$2a$10$dev-placeholder-hash', '555-0001', '456 Elm St');
+VALUES (1, 'Test User', 'user@example.com', '$2a$10$dev-placeholder-hash', '555-0001', '456 Elm St'),
+       (2, 'Delivery Driver', 'driver@example.com', '$2a$10$driver-placeholder-hash', '555-2000', 'Warehouse');
 
 -- Map the user to ROLE_USER explicitly
 INSERT INTO user_roles (user_id, role_name) VALUES (1, 'ROLE_USER');
+INSERT INTO user_roles (user_id, role_name) VALUES (2, 'ROLE_DRIVER');
 
 -- Insert restaurants with explicit ids
 INSERT INTO restaurants (id, name, cuisine, address, contact, rating)
@@ -121,10 +125,10 @@ VALUES (1, 1, 'Spaghetti Carbonara', 'Classic with egg and pancetta', 12.50, NUL
        (4, 2, 'Miso Soup', 'Warm miso soup', 2.50, NULL);
 
 -- Insert a delivery driver with explicit id
-INSERT INTO delivery_drivers (id, name, contact, available) VALUES (1, 'Driver One', '555-1000', TRUE);
+INSERT INTO delivery_drivers (id, user_id, name, contact, available) VALUES (1, 2, 'Driver One', '555-1000', TRUE);
 
 -- Reset AUTO_INCREMENT values to avoid collisions for subsequent inserts
-ALTER TABLE users AUTO_INCREMENT = 2;
+ALTER TABLE users AUTO_INCREMENT = 3;
 ALTER TABLE restaurants AUTO_INCREMENT = 3;
 ALTER TABLE menu_items AUTO_INCREMENT = 5;
 ALTER TABLE delivery_drivers AUTO_INCREMENT = 2;

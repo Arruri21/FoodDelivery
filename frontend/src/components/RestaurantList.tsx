@@ -4,7 +4,7 @@ import type { Restaurant } from '../types'
 
 interface RestaurantListProps {
   selectedId: number | null
-  onSelect: (id: number) => void
+  onSelect: (restaurant: Restaurant) => void
 }
 
 export default function RestaurantList({ selectedId, onSelect }: RestaurantListProps) {
@@ -45,10 +45,10 @@ export default function RestaurantList({ selectedId, onSelect }: RestaurantListP
               className={isActive ? 'restaurant-card active' : 'restaurant-card'}
               role="button"
               tabIndex={0}
-              onClick={() => onSelect(restaurant.id)}
+              onClick={() => onSelect(restaurant)}
               onKeyDown={(event) => {
                 if (event.key === 'Enter') {
-                  onSelect(restaurant.id)
+                  onSelect(restaurant)
                 }
               }}
               aria-pressed={isActive}
@@ -69,7 +69,7 @@ export default function RestaurantList({ selectedId, onSelect }: RestaurantListP
                   className="btn btn-primary"
                   onClick={(event) => {
                     event.stopPropagation()
-                    onSelect(restaurant.id)
+                    onSelect(restaurant)
                   }}
                 >
                   View Menu

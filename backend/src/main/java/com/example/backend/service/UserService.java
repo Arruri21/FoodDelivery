@@ -1,5 +1,6 @@
 package com.example.backend.service;
 
+import com.example.backend.model.Role;
 import com.example.backend.model.User;
 import com.example.backend.repository.UserRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -30,5 +31,19 @@ public class UserService {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
         }
         return userRepository.save(user);
+    }
+
+    public boolean isAdmin(Long userId) {
+        return hasRole(userId, Role.ROLE_ADMIN);
+    }
+
+    public boolean isDriver(Long userId) {
+        return hasRole(userId, Role.ROLE_DRIVER);
+    }
+
+    public boolean hasRole(Long userId, Role role) {
+        return userRepository.findById(userId)
+                .map(user -> user.getRoles() != null && user.getRoles().contains(role))
+                .orElse(false);
     }
 }

@@ -2,6 +2,7 @@ package com.example.backend.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -18,6 +19,9 @@ public class Order {
     @ManyToOne
     private Restaurant restaurant;
 
+    @ManyToOne
+    private DeliveryDriver driver;
+
     private LocalDateTime orderDate;
     private String deliveryAddress;
     private Double totalAmount;
@@ -33,6 +37,8 @@ public class Order {
     public void setUser(User user) { this.user = user; }
     public Restaurant getRestaurant() { return restaurant; }
     public void setRestaurant(Restaurant restaurant) { this.restaurant = restaurant; }
+    public DeliveryDriver getDriver() { return driver; }
+    public void setDriver(DeliveryDriver driver) { this.driver = driver; }
     public LocalDateTime getOrderDate() { return orderDate; }
     public void setOrderDate(LocalDateTime orderDate) { this.orderDate = orderDate; }
     public String getDeliveryAddress() { return deliveryAddress; }

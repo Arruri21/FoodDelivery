@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="480" viewBox="0 0 480 480" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="72" y1="48" x2="408" y2="432" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ff8a00"/>
+      <stop offset="0.5" stop-color="#ff3d81"/>
+      <stop offset="1" stop-color="#7a5cff"/>
+    </linearGradient>
+  </defs>
+  <rect x="40" y="40" width="400" height="400" rx="48" fill="url(#bg)" opacity="0.16"/>
+  <g stroke="url(#bg)" stroke-width="10" stroke-linecap="round">
+    <path d="M160 188c20-40 60-68 120-40" opacity="0.9"/>
+    <path d="M140 236c18-26 48-40 84-38" opacity="0.7"/>
+    <path d="M120 292c18-24 42-32 72-26" opacity="0.5"/>
+    <path d="M272 208c24-36 66-58 112-32" opacity="0.85"/>
+    <path d="M256 260c24-28 58-36 96-25" opacity="0.65"/>
+    <path d="M240 320c24-24 46-24 72-16" opacity="0.45"/>
+  </g>
+  <circle cx="180" cy="140" r="18" fill="#ffb347"/>
+  <circle cx="320" cy="132" r="22" fill="#ffc6ff" opacity="0.9"/>
+  <circle cx="260" cy="360" r="32" fill="#7a5cff" opacity="0.6"/>
+  <g fill="#ffffff">
+    <path d="M164 372c0-32 24-52 58-52 12 0 22 2 30 6l-8 22c-6-3-12-4-20-4-14 0-26 8-26 28s12 28 26 28c8 0 14-1 20-4l8 22c-8 4-18 6-30 6-34 0-58-20-58-52z" opacity="0.92"/>
+    <path d="M260 320h32l26 76 26-76h32l-44 120h-28z" opacity="0.92"/>
+  </g>
+</svg>

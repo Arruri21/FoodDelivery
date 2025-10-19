@@ -1,12 +1,7 @@
 import { useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
 import api from '../api'
-
-export type UserSession = {
-  userId: number
-  email: string
-  roles: string[]
-}
+import type { UserSession } from '../types'
 
 interface AuthPanelProps {
   user: UserSession | null
@@ -16,13 +11,29 @@ interface AuthPanelProps {
 
 type Mode = 'login' | 'signup'
 
+type SignupRole = 'CUSTOMER' | 'AGENT'
+
 const defaultSignupForm = {
   name: '',
   email: '',
   password: '',
   phone: '',
   address: '',
+  role: 'CUSTOMER' as SignupRole,
 }
+
+const signupRoleOptions: Array<{ key: SignupRole; title: string; description: string }> = [
+  {
+    key: 'CUSTOMER',
+    title: 'Customer',
+    description: 'Order meals and track deliveries',
+  },
+  {
+    key: 'AGENT',
+    title: 'Delivery agent',
+    description: 'Receive assignments and update status',
+  },
+]
 
 const defaultLoginForm = {
   email: '',
@@ -212,6 +223,23 @@ export default function AuthPanel({ user, onAuthenticated, onLogout }: AuthPanel
               placeholder="Delivery address"
             />
           </label>
+          <fieldset className="field role-field">
+            <legend>Account type</legend>
+            <div className="role-toggle">
+              {signupRoleOptions.map((option) => (
+                <button
+                  key={option.key}
+                  type="button"
+                  className={signupForm.role === option.key ? 'role-option active' : 'role-option'}
+                  onClick={() => setSignupForm({ ...signupForm, role: option.key })}
+                  aria-pressed={signupForm.role === option.key}
+                >
+                  <strong>{option.title}</strong>
+                  <span>{option.description}</span>
+                </button>
+              ))}
+            </div>
+          </fieldset>
           <button className="btn btn-primary" type="submit" disabled={loading}>
             {loading ? 'Creating account...' : 'Create account'}
           </button>

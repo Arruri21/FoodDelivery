@@ -17,4 +17,8 @@ public class RestaurantService {
 
     public List<Restaurant> findAll() { return restaurantRepository.findAll(); }
     public Optional<Restaurant> findById(Long id) { return restaurantRepository.findById(id); }
+
+    public Restaurant save(Restaurant restaurant) { return restaurantRepository.save(restaurant); }
+
+    public void delete(Long id) { restaurantRepository.deleteById(id); }
 }
