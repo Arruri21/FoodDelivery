@@ -15,7 +15,8 @@ A full-stack food delivery platform built with React (Vite) for the frontend and
 
 --> Secure authentication and role-based access
 
-![unnamed](https://github.com/user-attachments/assets/6252bde0-0057-4a30-81fb-57c71296c557)
+
+<b>Customer Portal</b> :
 
 
 
