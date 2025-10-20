@@ -27,7 +27,7 @@ A full-stack food delivery platform built with React (Vite) for the frontend and
 
 <b>Customer Portal</b> :
 
-<img width="1884" height="919" alt="image" src="https://github.com/user-attachments/assets/039dd5d8-7a92-4d8a-9b9a-8d744c5b29a6" />
+<img width="1906" height="911" alt="Screenshot 2025-10-20 233513" src="https://github.com/user-attachments/assets/26e0703c-a532-406f-90fa-3601f92544db" />
 
 <img width="1884" height="919" alt="Screenshot 2025-10-20 233653" src="https://github.com/user-attachments/assets/e12fa3f5-9c32-4be0-9402-593e48d09627" />
 
