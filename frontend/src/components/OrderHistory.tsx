@@ -94,6 +94,7 @@ export default function OrderHistory({ userId, refreshKey }: OrderHistoryProps) 
           const total = typeof order.totalAmount === 'number' ? order.totalAmount.toFixed(2) : '--'
           const status = (order.status ?? 'PENDING') as OrderStatus
           const canCancel = cancelableStatuses.includes(status)
+          const paymentStatus = order.paymentStatus ?? 'PENDING'
           return (
             <article key={order.id} className="history-card" aria-label={`Order ${order.id}`}>
               <header>
@@ -112,6 +113,9 @@ export default function OrderHistory({ userId, refreshKey }: OrderHistoryProps) 
                     </li>
                   ))}
                 </ul>
+                <p className="small-print" style={{ marginTop: '8px' }}>
+                  Payment: <strong>{paymentStatus}</strong>
+                </p>
               </div>
               <footer>
                 <span>Total</span>

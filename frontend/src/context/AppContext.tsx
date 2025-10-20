@@ -19,7 +19,7 @@ interface AppContextValue {
   removeFromCart: (menuItemId: number) => void
   clearCart: () => void
 
-  placeOrder: (deliveryAddress?: string) => Promise<void>
+  placeOrder: (deliveryAddress?: string, paymentMethod?: string) => Promise<{ paymentQrCode?: string; paymentStatus?: string; orderId?: number }>
   historyRefreshKey: number
 }
 
@@ -80,7 +80,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const placeOrder = useCallback(
-    async (deliveryAddress?: string) => {
+    async (deliveryAddress?: string, paymentMethod?: string) => {
       if (!user) throw new Error('Please sign in to place an order.')
       if (!selectedRestaurant) throw new Error('Select a restaurant to continue.')
       if (cart.length === 0) throw new Error('Add items to your cart first.')
@@ -90,11 +90,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
         restaurantId: selectedRestaurant.id,
         items: cart.map((entry) => ({ menuItemId: entry.id, quantity: entry.quantity })),
         ...(deliveryAddress ? { deliveryAddress } : {}),
+        ...(paymentMethod ? { paymentMethod } : {}),
       }
 
-      await api.post('/orders', payload)
-      setCart([])
+      const response = await api.post<{ orderId: number; paymentQrCode?: string; paymentStatus?: string }>('/orders', payload)
       setHistoryRefreshKey(Date.now())
+      return {
+        orderId: response.data.orderId,
+        paymentQrCode: response.data.paymentQrCode,
+        paymentStatus: response.data.paymentStatus
+      }
     },
     [cart, selectedRestaurant, user],
   )

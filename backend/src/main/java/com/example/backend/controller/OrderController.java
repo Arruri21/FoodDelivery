@@ -11,6 +11,7 @@ import com.example.backend.service.OrderService;
 import com.example.backend.service.RestaurantService;
 import com.example.backend.service.UserService;
 import com.example.backend.service.DeliveryDriverService;
+import com.example.backend.service.QRCodeService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,6 +32,7 @@ public class OrderController {
     private final RestaurantService restaurantService;
     private final MenuItemService menuItemService;
     private final DeliveryDriverService deliveryDriverService;
+    private final QRCodeService qrCodeService;
 
     private static final Set<String> CANCEL_ALLOWED_STATUSES = Set.of("PENDING", "CONFIRMED");
 
@@ -38,12 +40,14 @@ public class OrderController {
                            UserService userService,
                            RestaurantService restaurantService,
                            MenuItemService menuItemService,
-                           DeliveryDriverService deliveryDriverService) {
+                           DeliveryDriverService deliveryDriverService,
+                           QRCodeService qrCodeService) {
         this.orderService = orderService;
         this.userService = userService;
         this.restaurantService = restaurantService;
         this.menuItemService = menuItemService;
         this.deliveryDriverService = deliveryDriverService;
+        this.qrCodeService = qrCodeService;
     }
 
     @PostMapping
@@ -78,9 +82,32 @@ public class OrderController {
         }
         order.setItems(orderItems);
         order.setTotalAmount(total);
+        order.setPaymentStatus("PENDING");
+        if (body.containsKey("paymentMethod")) {
+            order.setPaymentMethod(body.get("paymentMethod").toString());
+        }
 
-        orderService.save(order);
-        return ResponseEntity.ok(Map.of("orderId", order.getId()));
+        Order savedOrder = orderService.save(order);
+        
+        // Generate QR code for payment with actual order ID
+        String qrCode = "";
+        try {
+            qrCode = qrCodeService.generatePaymentQRCode(savedOrder.getId(), total);
+            savedOrder.setPaymentQrCode(qrCode);
+            orderService.save(savedOrder);
+            System.out.println("QR Code generated successfully for order: " + savedOrder.getId());
+        } catch (Exception e) {
+            System.err.println("Failed to generate QR code for order " + savedOrder.getId());
+            e.printStackTrace();
+            // Don't fail the order, just proceed without QR code
+        }
+
+        return ResponseEntity.ok(Map.of(
+            "orderId", savedOrder.getId(),
+            "paymentQrCode", savedOrder.getPaymentQrCode() != null ? savedOrder.getPaymentQrCode() : "",
+            "paymentStatus", savedOrder.getPaymentStatus() != null ? savedOrder.getPaymentStatus() : "PENDING",
+            "paymentMethod", savedOrder.getPaymentMethod() != null ? savedOrder.getPaymentMethod() : "-"
+        ));
     }
 
     @GetMapping("/user/{userId}")

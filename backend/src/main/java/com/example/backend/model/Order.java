@@ -27,6 +27,16 @@ public class Order {
     private Double totalAmount;
     private String status;
 
+
+    @Column(length = 20)
+    private String paymentStatus; // PENDING, PAID, FAILED
+
+    @Column(length = 20)
+    private String paymentMethod; // QR, UPI, COD
+
+    @Column(length = 1000)
+    private String paymentQrCode; // Base64 encoded QR code image
+
     @OneToMany(cascade = CascadeType.ALL)
     private List<OrderItem> items;
 
@@ -47,6 +57,12 @@ public class Order {
     public void setTotalAmount(Double totalAmount) { this.totalAmount = totalAmount; }
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+    public String getPaymentStatus() { return paymentStatus; }
+    public void setPaymentStatus(String paymentStatus) { this.paymentStatus = paymentStatus; }
+    public String getPaymentMethod() { return paymentMethod; }
+    public void setPaymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; }
+    public String getPaymentQrCode() { return paymentQrCode; }
+    public void setPaymentQrCode(String paymentQrCode) { this.paymentQrCode = paymentQrCode; }
     public List<OrderItem> getItems() { return items; }
     public void setItems(List<OrderItem> items) { this.items = items; }
 }

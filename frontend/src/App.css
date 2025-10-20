@@ -202,6 +202,11 @@ body,html,#root{font-family:Inter,Segoe UI,Roboto,Arial,sans-serif;color:#e6eef8
 .totals{display:flex;align-items:center;justify-content:space-between;font-size:16px}
 .empty-cart{padding:24px;border-radius:10px;background:rgba(255,255,255,0.02);text-align:center}
 
+.payment-section{padding:16px;border-radius:12px;background:rgba(122,92,255,0.08);border:1px solid rgba(122,92,255,0.2);margin-top:12px}
+.payment-section h4{margin:0 0 12px 0;color:#d5c8ff}
+.qr-container{display:flex;justify-content:center;align-items:center;padding:16px;background:white;border-radius:8px}
+.qr-code{max-width:100%;height:auto;display:block}
+
 .order-history{display:flex;flex-direction:column;gap:16px}
 .history-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
 .history-card{display:flex;flex-direction:column;gap:12px;padding:14px;border-radius:12px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.02)}
@@ -213,6 +218,39 @@ body,html,#root{font-family:Inter,Segoe UI,Roboto,Arial,sans-serif;color:#e6eef8
 .history-card footer .btn{margin-left:auto}
 
 .menu-item .btn{align-self:center}
+
+/* Payment Modal Styles */
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.75);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px;backdrop-filter:blur(4px)}
+.modal-content{background:linear-gradient(135deg,rgba(15,23,36,0.98),rgba(20,30,48,0.98));border-radius:20px;max-width:500px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.1)}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:24px;border-bottom:1px solid rgba(255,255,255,0.1)}
+.modal-header h2{margin:0;font-size:24px;color:#fff}
+.modal-close{background:none;border:none;color:#fff;font-size:32px;cursor:pointer;opacity:0.7;transition:opacity 0.2s;padding:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center}
+.modal-close:hover{opacity:1}
+.payment-modal{min-height:400px}
+.payment-amount{padding:24px;text-align:center;background:rgba(122,92,255,0.1);border-bottom:1px solid rgba(255,255,255,0.1)}
+.payment-amount .muted{display:block;font-size:14px;margin-bottom:8px}
+.payment-amount .amount{display:block;font-size:36px;font-weight:700;color:#7a5cff}
+.payment-methods{padding:24px}
+.payment-methods h3{margin:0 0 16px 0;font-size:18px}
+.payment-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:24px}
+.payment-tab{background:rgba(255,255,255,0.04);border:2px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px 12px;cursor:pointer;transition:all 0.2s;display:flex;flex-direction:column;align-items:center;gap:8px;color:#fff;font-size:13px;font-weight:600}
+.payment-tab:hover{background:rgba(255,255,255,0.08);border-color:rgba(122,92,255,0.3)}
+.payment-tab.active{background:rgba(122,92,255,0.15);border-color:#7a5cff;box-shadow:0 4px 12px rgba(122,92,255,0.2)}
+.tab-icon{font-size:28px}
+.payment-form{margin-top:20px}
+.qr-payment,.upi-payment,.cod-payment{display:flex;flex-direction:column;gap:16px}
+.qr-display{display:flex;flex-direction:column;align-items:center;gap:12px;padding:20px;background:rgba(255,255,255,0.04);border-radius:12px;border:1px solid rgba(255,255,255,0.08)}
+.payment-qr-code{max-width:250px;width:100%;height:auto;background:white;padding:16px;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.3)}
+.divider{display:flex;align-items:center;gap:12px;margin:16px 0;color:rgba(255,255,255,0.4);font-size:13px}
+.divider::before,.divider::after{content:"";flex:1;height:1px;background:rgba(255,255,255,0.1)}
+.cod-info{background:rgba(255,255,255,0.04);border-radius:12px;padding:20px;border:1px solid rgba(255,255,255,0.08)}
+.cod-notes{margin:16px 0 0 20px;padding:0;color:rgba(255,255,255,0.7);font-size:14px}
+.cod-notes li{margin:8px 0}
+.payment-success{padding:40px 24px;text-align:center}
+.success-icon{width:80px;height:80px;background:linear-gradient(135deg,#10b981,#059669);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 24px;font-size:48px;color:white;box-shadow:0 8px 24px rgba(16,185,129,0.3)}
+.payment-success h3{margin:0 0 12px 0;font-size:24px;color:#10b981}
+.payment-success p{margin:8px 0;color:rgba(255,255,255,0.7)}
+.field-hint{display:block;margin-top:6px;font-size:12px;color:rgba(255,255,255,0.5)}
 
 @media (max-width:880px){
   .page-two-column{grid-template-columns:1fr}
@@ -236,4 +274,11 @@ body,html,#root{font-family:Inter,Segoe UI,Roboto,Arial,sans-serif;color:#e6eef8
   .driver-order-actions .btn{width:100%}
   .history-card footer{flex-direction:column;align-items:flex-start;gap:12px}
   .history-card footer .btn{margin-left:0;width:100%}
+  .modal-content{max-width:100%;margin:0 10px}
+  .payment-tabs{grid-template-columns:1fr}
+  .payment-tab{padding:12px 10px}
+  .payment-qr-code{max-width:200px}
+  .modal-header{padding:16px}
+  .payment-amount{padding:16px}
+  .payment-methods{padding:16px}
 }

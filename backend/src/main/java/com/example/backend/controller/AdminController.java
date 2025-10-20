@@ -92,33 +92,30 @@ public class AdminController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "order not found"));
         }
         Order order = orderOpt.get();
-        DeliveryDriver previousDriver = order.getDriver();
-        DeliveryDriver nextDriver = previousDriver;
+    DeliveryDriver previousDriver = order.getDriver();
+    DeliveryDriver nextDriver = null;
 
         if (body.containsKey("driverId")) {
             Object driverValue = body.get("driverId");
-            if (driverValue == null || driverValue.toString().isBlank()) {
-                nextDriver = null;
-            } else {
-                Long driverId;
+            if (driverValue != null && !driverValue.toString().isBlank()) {
                 try {
-                    driverId = Long.parseLong(driverValue.toString());
+                    Long driverId = Long.valueOf(driverValue.toString());
+                    Optional<DeliveryDriver> driverOpt = deliveryDriverService.findById(driverId);
+                    if (driverOpt.isEmpty()) {
+                        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "driver not found"));
+                    }
+                    nextDriver = driverOpt.get();
                 } catch (NumberFormatException ex) {
                     return ResponseEntity.badRequest().body(Map.of("error", "invalid driverId"));
                 }
-                Optional<DeliveryDriver> driverOpt = deliveryDriverService.findById(driverId);
-                if (driverOpt.isEmpty()) {
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "driver not found"));
-                }
-                nextDriver = driverOpt.get();
             }
 
-            if (previousDriver != null && !Objects.equals(previousDriver.getId(), nextDriver != null ? nextDriver.getId() : null)) {
+            if (previousDriver != null && (nextDriver == null || !Objects.equals(previousDriver.getId(), nextDriver.getId()))) {
                 previousDriver.setAvailable(Boolean.TRUE);
                 deliveryDriverService.save(previousDriver);
             }
 
-            if (nextDriver != null && !Objects.equals(previousDriver != null ? previousDriver.getId() : null, nextDriver.getId())) {
+            if (nextDriver != null && (previousDriver == null || !Objects.equals(previousDriver.getId(), nextDriver.getId()))) {
                 nextDriver.setAvailable(Boolean.FALSE);
                 deliveryDriverService.save(nextDriver);
             }
@@ -256,12 +253,30 @@ public class AdminController {
         return ResponseEntity.noContent().build();
     }
 
+    @PatchMapping("/orders/{orderId}/payment")
+    public ResponseEntity<?> updatePaymentStatus(@PathVariable Long orderId,
+                                                 @RequestParam Long userId,
+                                                 @RequestBody Map<String, String> body) {
+        if (!userService.isAdmin(userId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", "admin privileges required"));
+        }
+        Optional<Order> orderOpt = orderService.findById(orderId);
+        if (orderOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "order not found"));
+        }
+        Order order = orderOpt.get();
+        String paymentStatus = body.get("paymentStatus");
+        if (paymentStatus != null && !paymentStatus.isBlank()) {
+            order.setPaymentStatus(paymentStatus.toUpperCase());
+            orderService.save(order);
+        }
+        return ResponseEntity.ok(toOrderView(order));
+    }
+
     private Map<String, Object> toDriverView(DeliveryDriver driver) {
         Map<String, Object> map = new HashMap<>();
         map.put("id", driver.getId());
         map.put("name", driver.getName());
-        map.put("contact", driver.getContact());
-        map.put("available", driver.getAvailable());
         if (driver.getUser() != null) {
             map.put("user", Map.of(
                     "id", driver.getUser().getId(),
@@ -278,6 +293,9 @@ public class AdminController {
         map.put("totalAmount", order.getTotalAmount());
         map.put("deliveryAddress", order.getDeliveryAddress());
         map.put("orderDate", order.getOrderDate());
+    map.put("paymentStatus", order.getPaymentStatus());
+    map.put("paymentMethod", order.getPaymentMethod());
+    map.put("paymentQrCode", order.getPaymentQrCode());
         if (order.getRestaurant() != null) {
             map.put("restaurant", Map.of(
                     "id", order.getRestaurant().getId(),

@@ -38,6 +38,8 @@ export type OrderSummaryPayload = {
   deliveryAddress?: string
   status?: string
   totalAmount?: number | null
+  paymentStatus?: string
+  paymentQrCode?: string
   restaurant?: Restaurant | null
   items?: OrderItemSummary[]
 }
@@ -56,6 +58,9 @@ export type AdminOrder = {
   totalAmount?: number | null
   deliveryAddress?: string | null
   orderDate?: string | null
+  paymentStatus?: string | null
+  paymentMethod?: string | null
+  paymentQrCode?: string | null
   restaurant?: { id: number; name: string | null }
   user?: { id: number; name?: string | null; email?: string | null }
   driver?: { id: number; name?: string | null; available?: boolean | null }

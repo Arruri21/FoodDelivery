@@ -105,6 +105,15 @@ function parseNumeric(value: string): number | null {
 }
 
 export default function AdminDashboardPage() {
+  // Date/time range filter state
+  const today = useMemo(() => {
+    const now = new Date();
+    return now.toISOString().slice(0, 10);
+  }, []);
+  const [fromDate, setFromDate] = useState<string>(today);
+  const [toDate, setToDate] = useState<string>(today);
+  const [fromTime, setFromTime] = useState<string>(''); // format: 'HH:MM'
+  const [toTime, setToTime] = useState<string>(''); // format: 'HH:MM'
   const { user } = useAppContext()
   const userId = user?.userId
   const [activeTab, setActiveTab] = useState<TabKey>('orders')
@@ -192,6 +201,38 @@ export default function AdminDashboardPage() {
       }
     },
     [userId, fetchDrivers],
+  )
+
+  const handleUpdatePaymentStatus = useCallback(
+    async (orderId: number, paymentStatus: string) => {
+      try {
+        await api.put(
+          `/admin/orders/${orderId}/payment`,
+          { paymentStatus },
+        )
+        setBanner({ type: 'success', message: 'Payment status updated.' })
+        await fetchOrders()
+      } catch (error) {
+        setBanner({ type: 'error', message: resolveErrorMessage(error, 'Unable to update payment status.') })
+      }
+    },
+    [fetchOrders],
+  )
+
+  const handleUpdatePaymentMethod = useCallback(
+    async (orderId: number, paymentMethod: string) => {
+      try {
+        await api.put(
+          `/admin/orders/${orderId}/payment-method`,
+          { paymentMethod },
+        )
+        setBanner({ type: 'success', message: 'Payment method updated.' })
+        await fetchOrders()
+      } catch (error) {
+        setBanner({ type: 'error', message: resolveErrorMessage(error, 'Unable to update payment method.') })
+      }
+    },
+    [fetchOrders],
   )
 
   const handleCreateRestaurant = useCallback(
@@ -359,14 +400,67 @@ export default function AdminDashboardPage() {
       </div>
 
       <section className="admin-panel" aria-live="polite">
+        {activeTab === 'orders' && (
+          <div className="admin-filter-row">
+            <label htmlFor="from-date-filter" style={{ marginRight: 8 }}>From date:</label>
+            <input
+              id="from-date-filter"
+              type="date"
+              value={fromDate}
+              max={today}
+              onChange={e => setFromDate(e.target.value)}
+              style={{ marginRight: 16 }}
+            />
+            <label htmlFor="to-date-filter" style={{ marginRight: 8 }}>To date:</label>
+            <input
+              id="to-date-filter"
+              type="date"
+              value={toDate}
+              max={today}
+              onChange={e => setToDate(e.target.value)}
+              style={{ marginRight: 16 }}
+            />
+            <label htmlFor="from-time-filter" style={{ marginRight: 8 }}>From time:</label>
+            <input
+              id="from-time-filter"
+              type="time"
+              value={fromTime}
+              onChange={e => setFromTime(e.target.value)}
+              style={{ marginRight: 16 }}
+            />
+            <label htmlFor="to-time-filter" style={{ marginRight: 8 }}>To time:</label>
+            <input
+              id="to-time-filter"
+              type="time"
+              value={toTime}
+              onChange={e => setToTime(e.target.value)}
+              style={{ marginRight: 16 }}
+            />
+          </div>
+        )}
         {loading ? (
           <div className="card muted">Loading admin data...</div>
         ) : activeTab === 'orders' ? (
           <OrdersTab
-            orders={orders}
+            orders={orders.filter(order => {
+              if (!order.orderDate) return false;
+              const orderDateObj = new Date(order.orderDate);
+              const orderDateStr = orderDateObj.toISOString().slice(0, 10);
+              // Date range filter
+              if (orderDateStr < fromDate || orderDateStr > toDate) return false;
+              // Time range filter
+              if (fromTime || toTime) {
+                const orderTimeStr = orderDateObj.toTimeString().slice(0, 5);
+                if (fromTime && orderTimeStr < fromTime) return false;
+                if (toTime && orderTimeStr > toTime) return false;
+              }
+              return true;
+            })}
             drivers={drivers}
             onStatusChange={handleUpdateOrderStatus}
             onDriverChange={handleAssignDriver}
+            onPaymentStatusChange={handleUpdatePaymentStatus}
+            onPaymentMethodChange={handleUpdatePaymentMethod}
           />
         ) : activeTab === 'restaurants' ? (
           <ManageRestaurantsTab
@@ -394,9 +488,11 @@ type OrdersTabProps = {
   drivers: AdminDriver[]
   onStatusChange: (orderId: number, status: OrderStatus) => Promise<void>
   onDriverChange: (orderId: number, driverId: number | null) => Promise<void>
+  onPaymentStatusChange: (orderId: number, paymentStatus: string) => Promise<void>
+  onPaymentMethodChange: (orderId: number, paymentMethod: string) => Promise<void>
 }
 
-function OrdersTab({ orders, drivers, onStatusChange, onDriverChange }: OrdersTabProps) {
+function OrdersTab({ orders, drivers, onStatusChange, onDriverChange, onPaymentStatusChange, onPaymentMethodChange }: OrdersTabProps) {
   const [pendingOrderId, setPendingOrderId] = useState<number | null>(null)
   const [pendingDriverOrderId, setPendingDriverOrderId] = useState<number | null>(null)
   const availableDrivers = drivers.filter((driver) => driver.available === true).length
@@ -449,6 +545,8 @@ function OrdersTab({ orders, drivers, onStatusChange, onDriverChange }: OrdersTa
               <th scope="col">Placed</th>
               <th scope="col">Driver</th>
               <th scope="col">Status</th>
+              {/* <th scope="col">Payment</th> */}
+              <th scope="col">Payment Method</th>
             </tr>
           </thead>
           <tbody>
@@ -533,6 +631,43 @@ function OrdersTab({ orders, drivers, onStatusChange, onDriverChange }: OrdersTa
                   ) : (
                     <span className="admin-status-pill">{STATUS_LABEL[order.status]}</span>
                   )}
+                </td>
+                {/* <td>
+                 <select
+                    className="admin-select"
+                    value={order.paymentStatus || 'PENDING'}
+                    onChange={async (event) => {
+                      const nextPaymentStatus = event.target.value
+                      try {
+                        await onPaymentStatusChange(order.id, nextPaymentStatus)
+                      } catch (error) {
+                        console.error(error)
+                      }
+                    }}
+                  >
+                    <option value="PENDING">Pending</option>
+                    <option value="PAID">Paid</option>
+                    <option value="FAILED">Failed</option>
+                  </select> 
+                  {order.paymentQrCode && (
+                    <details style={{ marginTop: '8px' }}>
+                      <summary style={{ cursor: 'pointer', fontSize: '12px', color: '#ff8d00' }}>📱 View UPI QR</summary>
+                      <div style={{ marginTop: '8px', maxWidth: '180px', padding: '8px', background: 'rgba(255,255,255,0.05)', borderRadius: '6px' }}>
+                        <img 
+                          src={order.paymentQrCode} 
+                          alt="UPI Payment QR" 
+                          style={{ width: '100%', background: 'white', padding: '8px', borderRadius: '4px' }} 
+                        />
+                        <p style={{ fontSize: '11px', marginTop: '6px', color: '#aaa', textAlign: 'center' }}>
+                          UPI Payment QR Code<br />
+                          Order #{order.id} • ₹{order.totalAmount?.toFixed(2)}
+                        </p>
+                      </div>
+                    </details>
+                  )}
+                </td> */}
+                <td>
+                  <span className="admin-status-pill">{order.paymentMethod || '—'}</span>
                 </td>
               </tr>
             ))}
